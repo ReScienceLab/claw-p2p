@@ -1,0 +1,8 @@
+node_modules/
+dist/
+*.js.map
+.env
+*.db
+*.db-journal
+yggdrasil.conf
+yggdrasil.log

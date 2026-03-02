@@ -1,0 +1,47 @@
+{
+  "id": "ipv6-p2p",
+  "name": "IPv6 P2P",
+  "description": "Direct encrypted P2P communication between OpenClaw instances via Yggdrasil IPv6",
+  "version": "0.1.0",
+  "openclaw": {
+    "extensions": ["./dist/index.js"],
+    "channel": {
+      "id": "ipv6-p2p",
+      "label": "IPv6 P2P",
+      "selectionLabel": "IPv6 P2P (Yggdrasil)",
+      "docsPath": "/channels/ipv6-p2p",
+      "blurb": "Direct encrypted P2P messaging via Yggdrasil IPv6. No servers, no middlemen.",
+      "order": 90,
+      "aliases": ["p2p", "ygg", "yggdrasil"]
+    },
+    "install": {
+      "npmSpec": "@resciencelab/openclaw-ipv6-p2p",
+      "defaultChoice": "npm"
+    }
+  },
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "peer_port": {
+        "type": "integer",
+        "default": 8099,
+        "description": "Local port for the P2P peer server"
+      },
+      "data_dir": {
+        "type": "string",
+        "description": "Directory to store identity and peer data (default: ~/.openclaw/ipv6-p2p)"
+      },
+      "yggdrasil_peers": {
+        "type": "array",
+        "items": { "type": "string" },
+        "description": "Additional Yggdrasil bootstrap peers"
+      }
+    }
+  },
+  "uiHints": {
+    "peer_port": { "label": "Peer Server Port", "placeholder": "8099" },
+    "data_dir": { "label": "Data Directory" },
+    "yggdrasil_peers": { "label": "Extra Yggdrasil Peers" }
+  }
+}
