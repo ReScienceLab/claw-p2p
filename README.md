@@ -105,10 +105,6 @@ The peer server listens on `[::]:8099` (all IPv6 interfaces, including Yggdrasil
 3. **Signature**: Ed25519 signature verified against sender's public key
 4. **TOFU**: First message from a peer caches their public key; subsequent messages must match
 
-## Connection to Agent Economy
-
-This plugin is the P2P communication foundation for the [agent-economy-ipv6-mvp](https://github.com/ReScienceLab/agent-economy-ipv6-mvp) project. Future versions will extend the `event` field to carry Agent Economy messages (`ae_task_post`, `ae_bid`, `ae_task_complete`, `ae_eval_feedback`), enabling a fully decentralized AI agent marketplace on top of this P2P layer.
-
 ## License
 
 MIT
