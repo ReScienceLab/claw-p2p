@@ -12,7 +12,7 @@ import { onMessage } from "./peer-server";
 export const CHANNEL_CONFIG_SCHEMA = {
   schema: {
     type: "object",
-    additionalProperties: true,
+    additionalProperties: false,
     properties: {
       enabled: { type: "boolean" },
       dmPolicy: {
