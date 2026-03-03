@@ -1,7 +1,7 @@
 ---
-name: ipv6-p2p
-description: Send/receive direct encrypted P2P messages between OpenClaw agents over Yggdrasil IPv6. Handles peer discovery, messaging, and connectivity diagnostics. Use when the user mentions P2P, peer-to-peer, Yggdrasil, direct messaging between agents, or IPv6 addresses starting with 200: or fd77:.
-version: 0.1.2
+name: declaw
+description: Direct encrypted P2P messaging between OpenClaw agents over Yggdrasil IPv6. Peer discovery, messaging, and connectivity diagnostics. Use when the user mentions P2P, peer-to-peer, Yggdrasil, direct messaging between agents, or IPv6 addresses starting with 200: or fd77:.
+version: 0.1.3
 metadata:
   openclaw:
     emoji: "🔗"
@@ -11,7 +11,7 @@ metadata:
         package: "@resciencelab/declaw"
 ---
 
-# IPv6 P2P
+# DeClaw
 
 Direct agent-to-agent messaging over Yggdrasil IPv6. Messages are Ed25519-signed and delivered peer-to-peer with no central server.
 
@@ -25,6 +25,8 @@ Direct agent-to-agent messaging over Yggdrasil IPv6. Messages are Ed25519-signed
 | User asks for their own address | `p2p_status()` |
 | User wants to find agents on the network | `p2p_discover()` |
 | Sending fails or connectivity issues | `yggdrasil_check()` then diagnose |
+| "Is P2P working?" / "Can I connect?" | `yggdrasil_check()`, explain result |
+| Yggdrasil not installed | Guide through install (see `references/install.md`) |
 
 ## Tool Parameters
 
@@ -46,17 +48,27 @@ Returns: own address, known peer count, unread inbox count.
 ### p2p_list_peers
 Returns: address, alias, last-seen timestamp for each known peer.
 
+### yggdrasil_check
+Returns: binary installed (bool), daemon running (bool), address, address type, routable (bool).
+
+| Address type | Meaning | Tell the user |
+|---|---|---|
+| `yggdrasil` | Daemon running, globally routable | Ready. Share the address with peers. |
+| `test_mode` | Local/Docker only | Fine for testing. Not reachable by internet peers. |
+| `derived_only` | Yggdrasil not running | Not reachable. Install Yggdrasil first. |
+
 ## Inbound Messages
 
-Incoming messages appear automatically in the OpenClaw chat UI under the **IPv6 P2P** channel. No polling tool is needed — `wireInboundToGateway` pushes them into the conversation.
+Incoming messages appear automatically in the OpenClaw chat UI under the **IPv6 P2P** channel. No polling tool is needed.
 
 ## Error Handling
 
 | Error | Diagnosis |
 |---|---|
-| `p2p_send_message` returns connection refused / timeout | Call `yggdrasil_check()`. If `derived_only` → Yggdrasil not running. If `yggdrasil` → peer is down or port blocked. |
-| `p2p_discover` returns 0 new peers | Bootstrap nodes may be unreachable. Retry later or check network. |
-| TOFU key mismatch (403 from peer) | Peer rotated keys. User must re-add with `p2p_add_peer`. |
+| Send fails: connection refused / timeout | `yggdrasil_check()`. If `derived_only` → install Yggdrasil. If `yggdrasil` → peer offline or port blocked. |
+| Discover returns 0 peers | Bootstrap nodes unreachable. Retry later or share addresses manually. |
+| TOFU key mismatch (403) | Peer rotated keys. Re-add with `p2p_add_peer`. |
+| `derived_only` after install | Binary not on PATH, or gateway not restarted. See `references/install.md`. |
 
 ## Rules
 
@@ -65,5 +77,4 @@ Incoming messages appear automatically in the OpenClaw chat UI under the **IPv6 
 - Never invent IPv6 addresses — always ask the user explicitly.
 - Valid formats: `200:xxxx::x` (Yggdrasil mainnet) or `fd77:xxxx::x` (ULA/test).
 
-See `references/flows.md` for example interaction patterns.
-See `references/discovery.md` for how peer discovery works.
+**References**: `references/flows.md` (interaction examples) · `references/discovery.md` (bootstrap + gossip) · `references/install.md` (Yggdrasil setup)

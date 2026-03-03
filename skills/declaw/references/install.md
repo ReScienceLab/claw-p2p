@@ -72,9 +72,29 @@ Make sure `C:\Program Files\Yggdrasil` is on your system `PATH`.
 
 ---
 
+## Docker
+
+```dockerfile
+# Requires NET_ADMIN for TUN interface
+docker run --cap-add=NET_ADMIN --device=/dev/net/tun ...
+```
+
+---
+
 ## After any install
 
 1. Restart the OpenClaw gateway.
 2. The plugin detects the binary, generates a config, and starts the daemon.
 3. Your `200::/8` address will be shown in the gateway logs.
 4. Call `yggdrasil_check()` to confirm and get your routable address to share.
+
+## Troubleshooting
+
+If `yggdrasil_check()` still returns `derived_only` after install:
+
+| Symptom | Fix |
+|---|---|
+| `which yggdrasil` returns nothing | Binary not on PATH. Reinstall or add to PATH. |
+| Binary found but daemon not starting | Restart the OpenClaw gateway — plugin detects binary at startup. |
+| Linux: permission denied on TUN | Needs `CAP_NET_ADMIN`. Run as root or `sudo setcap cap_net_admin+ep $(which yggdrasil)`. |
+| Docker: no TUN device | Add `--cap-add=NET_ADMIN --device=/dev/net/tun` to container. |
