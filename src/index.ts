@@ -84,11 +84,12 @@ export default function register(api: any) {
       // Wire incoming messages to OpenClaw gateway
       wireInboundToGateway(api);
 
-      // DHT peer discovery — run after server is up so we can receive replies
-      setImmediate(async () => {
+      // DHT peer discovery — delay startup to let Yggdrasil routes converge
+      const startupDelayMs = cfg.startup_delay_ms ?? 30_000;
+      setTimeout(async () => {
         await bootstrapDiscovery(identity!, peerPort, bootstrapPeers);
         startDiscoveryLoop(identity!, peerPort, discoveryIntervalMs);
-      });
+      }, startupDelayMs);
     },
 
     stop: async () => {

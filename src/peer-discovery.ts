@@ -24,7 +24,7 @@ import { listPeers, upsertDiscoveredPeer, getPeersForExchange } from "./peer-db"
  * TODO: replace with actual Yggdrasil address once deployed.
  */
 export const DEFAULT_BOOTSTRAP_PEERS: string[] = [
-  "200:e238:b94:c22d:ca87:6bef:8312:5f0a", // bootstrap node (us-east-2, t3.medium)
+  "200:697f:bda:1e8e:706a:6c5e:630b:51d", // bootstrap node (us-east-2, t3.medium)
 ];
 
 const EXCHANGE_TIMEOUT_MS = 8_000;

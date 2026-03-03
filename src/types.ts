@@ -36,6 +36,7 @@ export interface PluginConfig {
   test_mode?: boolean;
   bootstrap_peers?: string[];
   discovery_interval_ms?: number;
+  startup_delay_ms?: number;
 }
 
 /** Signed peer-exchange announcement sent to /peer/announce */

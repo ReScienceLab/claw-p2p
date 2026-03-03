@@ -90,8 +90,9 @@ function verifySignature(publicKeyB64, obj, signatureB64) {
 }
 
 function isYggdrasilAddr(addr) {
+  // Yggdrasil 200::/8 — first byte 0x02, compressed to "2XX:" in IPv6 text
   const clean = addr.replace(/^::ffff:/, "");
-  return /^02[0-9a-f]{2}:/i.test(clean);
+  return /^2[0-9a-f]{2}:/i.test(clean);
 }
 
 // ---------------------------------------------------------------------------

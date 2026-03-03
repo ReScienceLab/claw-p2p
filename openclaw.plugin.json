@@ -27,6 +27,21 @@
         "type": "boolean",
         "default": false,
         "description": "Skip Yggdrasil IP validation (for local/Docker testing without Yggdrasil daemon)"
+      },
+      "bootstrap_peers": {
+        "type": "array",
+        "items": { "type": "string" },
+        "description": "Bootstrap node Yggdrasil addresses for DHT peer discovery"
+      },
+      "discovery_interval_ms": {
+        "type": "integer",
+        "default": 300000,
+        "description": "How often to gossip with known peers (ms, default 5 min)"
+      },
+      "startup_delay_ms": {
+        "type": "integer",
+        "default": 30000,
+        "description": "Delay before first bootstrap attempt to allow Yggdrasil routes to converge (ms, default 30s)"
       }
     }
   },
@@ -34,6 +49,9 @@
     "peer_port": { "label": "Peer Server Port", "placeholder": "8099" },
     "data_dir": { "label": "Data Directory" },
     "yggdrasil_peers": { "label": "Extra Yggdrasil Peers" },
-    "test_mode": { "label": "Test Mode (no Yggdrasil)" }
+    "test_mode": { "label": "Test Mode (no Yggdrasil)" },
+    "bootstrap_peers": { "label": "Bootstrap Peers" },
+    "discovery_interval_ms": { "label": "Discovery Interval (ms)" },
+    "startup_delay_ms": { "label": "Bootstrap Startup Delay (ms)" }
   }
 }
