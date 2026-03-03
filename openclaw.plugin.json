@@ -3,8 +3,8 @@
   "name": "DeClaw",
   "description": "Direct encrypted P2P communication between OpenClaw instances via Yggdrasil IPv6",
   "version": "0.1.0",
-  "channels": ["ipv6-p2p"],
-  "skills": ["./skills/ipv6-p2p", "./skills/yggdrasil"],
+  "channels": ["declaw"],
+  "skills": ["./skills/declaw"],
   "configSchema": {
     "type": "object",
     "additionalProperties": false,
@@ -16,7 +16,7 @@
       },
       "data_dir": {
         "type": "string",
-        "description": "Directory to store identity and peer data (default: ~/.openclaw/ipv6-p2p)"
+        "description": "Directory to store identity and peer data (default: ~/.openclaw/declaw)"
       },
       "yggdrasil_peers": {
         "type": "array",

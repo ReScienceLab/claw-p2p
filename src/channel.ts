@@ -1,6 +1,6 @@
 /**
- * OpenClaw channel registration for IPv6 P2P messaging.
- * Registers "ipv6-p2p" as a messaging channel so OpenClaw users can
+ * OpenClaw channel registration for DeClaw P2P messaging.
+ * Registers "declaw" as a messaging channel so OpenClaw users can
  * chat directly with peers via the standard OpenClaw UI.
  */
 import { Identity } from "./types";
@@ -10,14 +10,14 @@ import { onMessage } from "./peer-server";
 
 export function buildChannel(identity: Identity, port: number) {
   return {
-    id: "ipv6-p2p",
+    id: "declaw",
     meta: {
-      id: "ipv6-p2p",
-      label: "IPv6 P2P",
-      selectionLabel: "IPv6 P2P (Yggdrasil)",
-      docsPath: "/channels/ipv6-p2p",
+      id: "declaw",
+      label: "DeClaw",
+      selectionLabel: "DeClaw (Yggdrasil P2P)",
+      docsPath: "/channels/declaw",
       blurb: "Direct encrypted P2P messaging via Yggdrasil IPv6. No servers, no middlemen.",
-      aliases: ["p2p", "ygg", "yggdrasil"],
+      aliases: ["p2p", "ygg", "yggdrasil", "ipv6-p2p"],
     },
     capabilities: { chatTypes: ["direct"] },
     config: {
@@ -35,7 +35,7 @@ export function buildChannel(identity: Identity, port: number) {
       sendText: async ({ text, account }: { text: string; account: { yggAddr: string } }) => {
         const result = await sendP2PMessage(identity, account.yggAddr, "chat", text, port);
         if (!result.ok) {
-          console.error(`[p2p] Failed to send to ${account.yggAddr}: ${result.error}`);
+          console.error(`[declaw] Failed to send to ${account.yggAddr}: ${result.error}`);
         }
         return { ok: result.ok };
       },
@@ -46,25 +46,19 @@ export function buildChannel(identity: Identity, port: number) {
 /**
  * Wire incoming P2P messages to the OpenClaw gateway so they appear
  * in the conversation UI as incoming channel messages.
- *
- * api.gateway is the internal Gateway object exposed to plugins.
- * We emit a synthetic inbound message event.
  */
 export function wireInboundToGateway(api: any): void {
   onMessage((msg) => {
     if (msg.event !== "chat") return;
     try {
-      // OpenClaw's internal gateway receives inbound channel messages via
-      // api.gateway.receiveChannelMessage (channel id + account id + text)
       api.gateway?.receiveChannelMessage?.({
-        channelId: "ipv6-p2p",
+        channelId: "declaw",
         accountId: msg.fromYgg,
         text: msg.content,
         senderId: msg.fromYgg,
       });
     } catch {
-      // Gateway API may differ by OpenClaw version — fallback: just log
-      console.log(`[p2p] Message from ${msg.fromYgg.slice(0, 20)}...: ${msg.content}`);
+      console.log(`[declaw] Message from ${msg.fromYgg.slice(0, 20)}...: ${msg.content}`);
     }
   });
 }

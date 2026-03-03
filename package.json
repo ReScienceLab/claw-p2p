@@ -1,6 +1,6 @@
 {
   "name": "@resciencelab/declaw",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "description": "Direct P2P communication between OpenClaw instances over Yggdrasil IPv6",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -15,10 +15,10 @@
       "./dist/index.js"
     ],
     "channel": {
-      "id": "ipv6-p2p",
-      "label": "IPv6 P2P",
-      "selectionLabel": "IPv6 P2P (Yggdrasil)",
-      "docsPath": "/channels/ipv6-p2p",
+      "id": "declaw",
+      "label": "DeClaw",
+      "selectionLabel": "DeClaw (Yggdrasil P2P)",
+      "docsPath": "/channels/declaw",
       "blurb": "Direct encrypted P2P messaging via Yggdrasil IPv6. No servers, no middlemen.",
       "order": 90,
       "aliases": [

@@ -28,7 +28,7 @@ import { Identity, YggdrasilInfo, PluginConfig } from "./types";
 
 let identity: Identity | null = null;
 let yggInfo: YggdrasilInfo | null = null;
-let dataDir: string = path.join(os.homedir(), ".openclaw", "ipv6-p2p");
+let dataDir: string = path.join(os.homedir(), ".openclaw", "declaw");
 let peerPort: number = 8099;
 let _testMode: boolean = false;
 let _startupTimer: ReturnType<typeof setTimeout> | null = null;
@@ -36,7 +36,7 @@ let _startupTimer: ReturnType<typeof setTimeout> | null = null;
 export default function register(api: any) {
   // ── 1. Background service ──────────────────────────────────────────────────
   api.registerService({
-    id: "ipv6-p2p-node",
+    id: "declaw-node",
 
     start: async () => {
       const cfg: PluginConfig = api.config?.plugins?.entries?.["declaw"]?.config ?? {};
@@ -114,14 +114,14 @@ export default function register(api: any) {
     // that reads identity at send-time
     api.registerChannel({
       plugin: {
-        id: "ipv6-p2p",
+        id: "declaw",
         meta: {
-          id: "ipv6-p2p",
-          label: "IPv6 P2P",
-          selectionLabel: "IPv6 P2P (Yggdrasil)",
-          docsPath: "/channels/ipv6-p2p",
+          id: "declaw",
+          label: "DeClaw",
+          selectionLabel: "DeClaw (Yggdrasil P2P)",
+          docsPath: "/channels/declaw",
           blurb: "Direct encrypted P2P messaging via Yggdrasil IPv6.",
-          aliases: ["p2p", "ygg"],
+          aliases: ["p2p", "ygg", "ipv6-p2p"],
         },
         capabilities: { chatTypes: ["direct"] },
         config: {

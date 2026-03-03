@@ -76,7 +76,7 @@ Slash commands:
         "enabled": true,
         "config": {
           "peer_port": 8099,
-          "data_dir": "~/.openclaw/ipv6-p2p",
+          "data_dir": "~/.openclaw/declaw",
           "yggdrasil_peers": [],
           "bootstrap_peers": [],
           "discovery_interval_ms": 600000,
@@ -111,7 +111,7 @@ flowchart TB
       DB["peer-db.ts<br/>TOFU peer store"]
     end
 
-    subgraph FS["Local Data Dir ~/.openclaw/ipv6-p2p"]
+    subgraph FS["Local Data Dir ~/.openclaw/declaw"]
       IDJSON["identity.json"]
       PEERS["peers.json"]
       YGGDIR["yggdrasil/"]
@@ -229,7 +229,7 @@ sequenceDiagram
 ### Local Files
 
 ```text
-~/.openclaw/ipv6-p2p/
+~/.openclaw/declaw/
 ├── identity.json              Ed25519 keypair + derived IPv6 addresses
 ├── peers.json                 Known peers + TOFU public key cache
 └── yggdrasil/
