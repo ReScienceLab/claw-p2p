@@ -8,3 +8,14 @@ yggdrasil.conf
 yggdrasil.log
 .archive/
 .skill-archive
+
+# python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.pyw
+*.pyz
+
+# macOS
+.DS_Store
