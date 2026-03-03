@@ -1,4 +1,4 @@
-# openclaw-ipv6-p2p
+# claw-p2p
 
 Direct encrypted P2P communication between [OpenClaw](https://github.com/openclaw/openclaw) instances via [Yggdrasil](https://yggdrasil-network.github.io/) IPv6.
 
@@ -25,7 +25,7 @@ Node A (200:aaa:...)   ←——— Yggdrasil P2P ———→   Node B (200:bbb
 ## Install
 
 ```bash
-openclaw plugins install @resciencelab/openclaw-ipv6-p2p
+openclaw plugins install @resciencelab/claw-p2p
 ```
 
 The plugin auto-generates an Ed25519 keypair and starts Yggdrasil on first run.

@@ -1,5 +1,5 @@
 /**
- * openclaw-ipv6-p2p — OpenClaw plugin entry point.
+ * claw-p2p — OpenClaw plugin entry point.
  *
  * Enables direct P2P communication between OpenClaw instances via Yggdrasil IPv6.
  * Each node gets a globally-routable 200::/8 address derived from its Ed25519 keypair.

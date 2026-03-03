@@ -1,5 +1,5 @@
 {
-  "name": "@resciencelab/openclaw-ipv6-p2p",
+  "name": "@resciencelab/claw-p2p",
   "version": "0.1.0",
   "description": "Direct P2P communication between OpenClaw instances over Yggdrasil IPv6",
   "main": "dist/index.js",
@@ -22,7 +22,7 @@
       "aliases": ["p2p", "ygg", "yggdrasil"]
     },
     "install": {
-      "npmSpec": "@resciencelab/openclaw-ipv6-p2p",
+      "npmSpec": "@resciencelab/claw-p2p",
       "defaultChoice": "npm"
     }
   },
