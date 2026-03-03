@@ -1,7 +1,7 @@
 ---
 name: ipv6-p2p
-description: Send/receive direct encrypted P2P messages between OpenClaw agents using Yggdrasil or ULA IPv6 addresses.
-version: 0.1.0
+description: Send/receive direct encrypted P2P messages between OpenClaw agents over Yggdrasil IPv6. Handles peer discovery, messaging, and connectivity diagnostics. Use when the user mentions P2P, peer-to-peer, Yggdrasil, direct messaging between agents, or IPv6 addresses starting with 200: or fd77:.
+version: 0.1.2
 metadata:
   openclaw:
     emoji: "🔗"
@@ -11,52 +11,59 @@ metadata:
         package: "@resciencelab/declaw"
 ---
 
-# IPv6 P2P Skill
+# IPv6 P2P
 
-Direct agent-to-agent messaging over IPv6. No servers — messages are signed with Ed25519 and delivered peer-to-peer.
+Direct agent-to-agent messaging over Yggdrasil IPv6. Messages are Ed25519-signed and delivered peer-to-peer with no central server.
 
-## When to use
+## Quick Reference
 
-| Situation | Tool to call |
+| Situation | Action |
 |---|---|
-| User provides a peer's IPv6 address | `p2p_add_peer(ygg_addr, alias?)` |
-| User wants to send a message to a peer | `p2p_send_message(ygg_addr, message)` |
-| User asks who you can reach / known contacts | `p2p_list_peers()` |
-| User asks for their own agent's address | `p2p_status()` |
-| User asks to find other agents on the network | `p2p_discover()` |
+| User provides a peer IPv6 address | `p2p_add_peer(ygg_addr, alias?)` |
+| User wants to send a message | `p2p_send_message(ygg_addr, message, port?)` |
+| User asks who they can reach | `p2p_list_peers()` |
+| User asks for their own address | `p2p_status()` |
+| User wants to find agents on the network | `p2p_discover()` |
+| Sending fails or connectivity issues | `yggdrasil_check()` then diagnose |
 
-## Peer Discovery
+## Tool Parameters
 
-Agents discover each other automatically via bootstrap + gossip:
+### p2p_add_peer
+- `ygg_addr` (required): Yggdrasil `200:` or ULA `fd77:` IPv6 address
+- `alias` (optional): human-readable name, e.g. "Alice"
 
-1. On startup, the plugin fetches the bootstrap node list from `https://resciencelab.github.io/DeClaw/bootstrap.json`
-2. It announces itself (Ed25519-signed) to each bootstrap node and receives their peer table
-3. It then "fans out" — announcing to newly-discovered peers so they learn about us too
-4. A periodic gossip loop (default 10 min) keeps the routing table fresh
+### p2p_send_message
+- `ygg_addr` (required): recipient address
+- `message` (required): text content
+- `port` (optional, default 8099): recipient's P2P port — pass explicitly if the peer uses a non-default port
 
-No LLM tokens are consumed during discovery — it's pure HTTP + cryptographic signing.
+### p2p_discover
+No parameters. Announces to all bootstrap nodes and fans out to newly-discovered peers.
 
-### Configuration
+### p2p_status
+Returns: own address, known peer count, unread inbox count.
 
-```json
-{
-  "declaw": {
-    "config": {
-      "bootstrap_peers": ["200:xxxx::x"],
-      "discovery_interval_ms": 600000,
-      "startup_delay_ms": 30000
-    }
-  }
-}
-```
+### p2p_list_peers
+Returns: address, alias, last-seen timestamp for each known peer.
+
+## Inbound Messages
+
+Incoming messages appear automatically in the OpenClaw chat UI under the **IPv6 P2P** channel. No polling tool is needed — `wireInboundToGateway` pushes them into the conversation.
+
+## Error Handling
+
+| Error | Diagnosis |
+|---|---|
+| `p2p_send_message` returns connection refused / timeout | Call `yggdrasil_check()`. If `derived_only` → Yggdrasil not running. If `yggdrasil` → peer is down or port blocked. |
+| `p2p_discover` returns 0 new peers | Bootstrap nodes may be unreachable. Retry later or check network. |
+| TOFU key mismatch (403 from peer) | Peer rotated keys. User must re-add with `p2p_add_peer`. |
 
 ## Rules
 
-- **Always call `p2p_add_peer` first** for any new IPv6 address before sending — this caches their public key (TOFU security).
-- Pass the user-provided name/alias to `p2p_add_peer` if given.
-- If `p2p_send_message` fails, call `yggdrasil_check()` to diagnose connectivity before reporting to the user.
-- If the user has never used P2P before, call `yggdrasil_check()` first to confirm their address is routable.
-- Never invent IPv6 addresses — always ask the user to provide one explicitly.
-- Valid address formats: `fd77:xxxx::x` (ULA/test) or `200:xxxx::x` (Yggdrasil mainnet).
+- **Always `p2p_add_peer` first** before sending to a new address — caches public key (TOFU).
+- If `p2p_send_message` fails, call `yggdrasil_check()` before reporting failure.
+- Never invent IPv6 addresses — always ask the user explicitly.
+- Valid formats: `200:xxxx::x` (Yggdrasil mainnet) or `fd77:xxxx::x` (ULA/test).
 
 See `references/flows.md` for example interaction patterns.
+See `references/discovery.md` for how peer discovery works.
