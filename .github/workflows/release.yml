@@ -1,16 +1,32 @@
 name: Release
 
 on:
-  push:
-    tags:
-      - "v*"
+  pull_request:
+    types: [closed]
+    branches: [main]
 
 permissions:
   contents: write
 
 jobs:
-  # ── 1. Build + test gate ───────────────────────────────────────────────────
+  # Only run when a release/* PR is merged (not closed without merge)
+  check:
+    if: github.event.pull_request.merged == true && startsWith(github.event.pull_request.head.ref, 'release/v')
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.extract.outputs.version }}
+    steps:
+      - name: Extract version from branch name
+        id: extract
+        run: |
+          BRANCH="${{ github.event.pull_request.head.ref }}"
+          VERSION="${BRANCH#release/v}"
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+          echo "Releasing v${VERSION}"
+
+  # ── 1. Build + test gate ─────────────────────────────────────────────────
   verify:
+    needs: check
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -24,22 +40,24 @@ jobs:
       - run: npm run build
       - run: node --test test/*.test.mjs
 
-  # ── 2. GitHub Release → triggers publish.yml (npm) ────────────────────────
+  # ── 2. Tag + GitHub Release → triggers publish.yml (npm) ────────────────
   github-release:
-    needs: verify
+    needs: [check, verify]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Create GitHub Release
+      - name: Create tag and GitHub Release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ needs.check.outputs.version }}
         run: |
-          TAG="${GITHUB_REF_NAME}"
-          gh release create "$TAG" --generate-notes --title "$TAG"
+          git tag "v${VERSION}"
+          git push origin "v${VERSION}"
+          gh release create "v${VERSION}" --generate-notes --title "v${VERSION}"
 
-  # ── 3. Publish to ClawHub ──────────────────────────────────────────────────
+  # ── 3. Publish to ClawHub ──────────────────────────────────────────────
   clawhub-publish:
-    needs: verify
+    needs: [check, verify]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -49,12 +67,12 @@ jobs:
       - name: Publish skill to ClawHub
         env:
           CLAWHUB_TOKEN: ${{ secrets.CLAWHUB_TOKEN }}
+          VERSION: ${{ needs.check.outputs.version }}
         run: |
-          VERSION="${GITHUB_REF_NAME#v}"
           npx clawhub@latest auth login --token "$CLAWHUB_TOKEN" --no-browser
           npx clawhub@latest publish "$(pwd)/skills/declaw" --version "$VERSION"
 
-  # ── 4. Backmerge main → develop ────────────────────────────────────────────
+  # ── 4. Backmerge main → develop ────────────────────────────────────────
   backmerge:
     needs: github-release
     runs-on: ubuntu-latest
