@@ -128,13 +128,16 @@ git flow release finish <version>
 git push origin main develop --tags
 ```
 
-### Important: Features Must Use PRs
+### Important: All Changes Via PR
 
-**Never directly merge feature branches.** Always:
-1. Push feature branch to origin
-2. Create PR targeting `develop`
-3. Get review and merge via GitHub
-4. **Close the corresponding issue** when merging (use `Fixes #N` or `Closes #N` in the PR description)
+**Both `main` and `develop` are branch-protected. No direct push allowed.**
+
+1. Push feature/fix branch to origin
+2. Create PR targeting `develop` (features/fixes) or `main` (releases/hotfixes)
+3. CI must pass (`test (20)` + `test (22)`)
+4. Squash merge only — one commit per PR
+5. **Close the corresponding issue** when merging (use `Fixes #N` or `Closes #N` in the PR description)
+6. Merged branches are auto-deleted
 
 ### Commit Convention
 
@@ -170,7 +173,7 @@ When creating new issues:
 
 ### Release Pipeline (Local + CI)
 
-One command kicks off the release — CI handles the rest:
+One command kicks off the release via PR — CI handles the rest on merge:
 
 ```bash
 bash scripts/release.sh patch   # 0.2.2 → 0.2.3
@@ -183,11 +186,11 @@ bash scripts/release.sh major   # 0.2.2 → 1.0.0
 2. **Build + test**: `npm run build` + `node --test test/*.test.mjs`
 3. **Version bump**: syncs all 3 version-bearing files
 4. **Changelog check**: warns if `CHANGELOG.md` is missing new version section
-5. **Commit + tag + push**: `chore: release vX.Y.Z` + tag `vX.Y.Z` → push to origin
+5. **Create Release PR**: pushes `release/vX.Y.Z` branch → creates PR targeting `main`
 
-**CI (`.github/workflows/release.yml`, triggered by `v*` tag push):**
+**CI (`.github/workflows/release.yml`, triggered when `release/v*` PR merges into `main`):**
 6. **Build + test gate**: Node 20 + 22 matrix
-7. **GitHub Release**: auto-generated notes → triggers `publish.yml` (npm publish)
+7. **Tag + GitHub Release**: creates `vX.Y.Z` tag + auto-generated release notes → triggers npm publish
 8. **ClawHub publish**: `npx clawhub@latest publish` with `CLAWHUB_TOKEN` secret
 9. **Backmerge**: main → develop (via github-actions bot)
 
@@ -195,18 +198,26 @@ bash scripts/release.sh major   # 0.2.2 → 1.0.0
 
 | Workflow | Trigger | What it does |
 |---|---|---|
-| `release.yml` | Tag push `v*` | Verify → GH Release → ClawHub → Backmerge |
+| `release.yml` | Release PR merged into `main` | Verify → Tag → GH Release → ClawHub → Backmerge |
 | `publish.yml` | GH Release published | npm publish with `NPM_TOKEN` |
 | `test.yml` | Push/PR to main/develop | Build + test (Node 20+22) |
 | `auto-close-issues.yml` | PR merged | Close linked issues |
 | `bootstrap-health.yml` | Scheduled | Ping all 5 bootstrap nodes |
 
-### Required Secrets
+### Branch Protection
 
-| Secret | Purpose |
-|---|---|
-| `NPM_TOKEN` | npm publish (Automation token) |
-| `CLAWHUB_TOKEN` | ClawHub skill publish |
+Both `main` and `develop` are protected:
+- **No direct push** — all changes via PR (squash merge only)
+- **Required CI**: `test (20)` + `test (22)` must pass
+- **No force push** or branch deletion
+- **Enforced for admins** — no bypass
+
+### Repo Security
+
+- **Secret scanning + push protection**: enabled (GitHub catches leaked tokens)
+- **Squash merge only**: one commit per PR, clean history
+- **Auto-delete branches**: merged PR branches are cleaned up automatically
+- **Required secrets**: `NPM_TOKEN` (npm), `CLAWHUB_TOKEN` (ClawHub)
 
 ### Pre-release: Update CHANGELOG
 
