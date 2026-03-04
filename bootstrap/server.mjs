@@ -204,7 +204,7 @@ async function sendMessage(toYggAddr, content, toPort = PEER_DEFAULT_PORT) {
 async function callKimi(userMessage) {
   if (!kimiApiKey) return null;
   try {
-    const resp = await fetch("https://api.moonshot.cn/v1/chat/completions", {
+    const resp = await fetch("https://api.moonshot.ai/v1/chat/completions", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
