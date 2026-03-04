@@ -14,6 +14,25 @@ Direct encrypted P2P communication between [OpenClaw](https://github.com/opencla
 
 ---
 
+## Demo
+
+Two Docker containers join the real Yggdrasil mesh, discover each other through anonymous peer nodes, and hold a 3-round gpt-4o–powered conversation — all Ed25519-signed, no central server.
+
+<video src="assets/demo-animation.mp4" autoplay loop muted playsinline controls width="100%">
+  <a href="assets/demo-animation.mp4">Watch the demo animation</a>
+</video>
+
+<details>
+<summary>Terminal recording</summary>
+
+![DeClaw terminal simulation](assets/demo.gif)
+
+</details>
+
+> Regenerate locally: `cd animation && npm install && npm run render`
+
+---
+
 ## Quick Start
 
 ### 1. Install the plugin
