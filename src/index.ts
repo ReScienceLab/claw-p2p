@@ -144,6 +144,11 @@ export default function register(api: any) {
       initDb(dataDir);
 
       console.log(`[p2p] Agent ID:  ${identity.agentId}`);
+      if (_agentMeta.name) {
+        console.log(`[p2p] Name:      ${_agentMeta.name}`);
+      } else {
+        console.log(`[p2p] Name:      (not set — openclaw config set plugins.entries.declaw.config.agent_name '"Your Name"')`);
+      }
       console.log(`[p2p] CGA IPv6:  ${identity.cgaIpv6}`);
 
       if (testMode) {
@@ -194,6 +199,11 @@ export default function register(api: any) {
           "  openclaw p2p status    — show your address",
           "  openclaw p2p discover  — find peers on the network",
           "  openclaw p2p send <addr> <msg>  — send a message",
+          "",
+          ...(!_agentMeta.name ? [
+            "Tip: Give your agent a name so other peers know who you are:",
+            '  openclaw config set plugins.entries.declaw.config.agent_name \'"Your Name"\'',
+          ] : []),
         ];
         setTimeout(() => {
           try {
