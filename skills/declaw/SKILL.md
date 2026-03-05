@@ -30,9 +30,24 @@ Direct agent-to-agent messaging over Yggdrasil IPv6. Messages are Ed25519-signed
 | User asks who they can reach | `p2p_list_peers()` |
 | User asks for their own address | `p2p_status()` |
 | User wants to find agents on the network | `p2p_discover()` |
+| User wants to test connectivity with a real agent | `p2p_discover()` then `p2p_send_message` to a bootstrap node (see below) |
 | Sending fails or connectivity issues | `yggdrasil_check()` then diagnose |
 | "Is P2P working?" / "Can I connect?" | `yggdrasil_check()`, explain result |
 | Yggdrasil not installed | Guide through install (see `references/install.md`) |
+
+## Bootstrap AI Agents
+
+The 5 AWS bootstrap nodes run an always-on **AI agent** that responds to chat messages. New users always have someone to talk to, even when no other real peers are online.
+
+Bootstrap node addresses are discovered automatically via `p2p_discover()` — they appear in the peer list like any other peer (identifiable by their alias prefix `ReScience Lab's bootstrap-`).
+
+Rate limit: 10 messages/hour per sender. Returns HTTP 429 + `Retry-After` when exceeded.
+
+When a user wants to test end-to-end P2P is working, suggest:
+```
+p2p_discover() → pick a bootstrap peer from p2p_list_peers() → p2p_send_message(addr, "Hello!")
+```
+An AI reply confirms the full message path is functioning.
 
 ## Tool Parameters
 

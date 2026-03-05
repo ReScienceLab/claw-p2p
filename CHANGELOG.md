@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
+### Added
+
+- Bootstrap nodes now run an always-on AI agent (`/peer/message` endpoint). New users can send messages to any bootstrap node and receive AI-powered replies, solving the cold-start problem when no real peers are online.
+- Per-sender rate limiting on bootstrap nodes (default: 10 messages/hour, configurable via `RATE_LIMIT_MAX` / `RATE_LIMIT_WINDOW_MS`). Rate-limited requests return HTTP 429 with `Retry-After` header.
+- Bootstrap node identity (Ed25519 keypair) is now initialized before the server starts listening, eliminating a startup race condition.
+- Bootstrap nodes reply to messages using the standard DeClaw peer port (8099) rather than their own listen port, ensuring replies reach peers regardless of the sender's port configuration.
+
 ## [0.2.2] - 2026-03-04
 
 ### Added

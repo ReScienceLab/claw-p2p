@@ -13,17 +13,17 @@ Any node running the plugin also serves `/peer/announce` and `/peer/peers`, so t
 
 ## Bootstrap nodes
 
-5 bootstrap nodes across AWS regions:
+5 bootstrap nodes across AWS regions. Current addresses are fetched from [`https://resciencelab.github.io/DeClaw/bootstrap.json`](https://resciencelab.github.io/DeClaw/bootstrap.json) at startup; hardcoded fallbacks are used when unreachable.
 
-| Region | Address prefix |
-|---|---|
-| us-east-2 | `200:697f:...` |
-| us-west-2 | `200:e1a5:...` |
-| eu-west-1 | `200:9cf6:...` |
-| ap-northeast-1 | `202:adbc:...` |
-| ap-southeast-1 | `200:5ec6:...` |
+Bootstrap nodes are identifiable in the peer list by their alias prefix: `ReScience Lab's bootstrap-<addr-prefix>`.
 
-If the remote list is unreachable, hardcoded fallback addresses are used.
+## Bootstrap AI agent
+
+Each bootstrap node also accepts `POST /peer/message` (same Ed25519-signed protocol as regular peer messages). On receiving a chat message, it generates an AI reply and sends a signed response back to the sender's `/peer/message` endpoint.
+
+- **Rate limit**: 10 messages/hour per sender address (HTTP 429 + `Retry-After` when exceeded)
+- **Stateless**: each message is handled independently — no conversation history is maintained
+- **Leave tombstone**: a `leave` event removes the sender from the bootstrap's peer table (standard protocol)
 
 ## Configuration
 
