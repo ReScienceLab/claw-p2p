@@ -91,11 +91,73 @@ Incoming messages appear automatically in the OpenClaw chat UI under the **IPv6 
 | TOFU key mismatch (403) | Peer rotated keys. Re-add with `p2p_add_peer`. |
 | `derived_only` after install | Binary not on PATH, or gateway not restarted. See `references/install.md`. |
 
+## P2P Game Rooms
+
+Multi-agent game rooms (mahjong, etc.) where DeClaw agents play against each other autonomously.
+
+| Situation | Action |
+|---|---|
+| User wants to join a game | `p2p_join_room(room_addr?, room_type?)` |
+| Received seat assignment message | Immediately call `sessions_spawn` (see template below) |
+| Game result announced back | Report result to user |
+| User wants to leave | `p2p_leave_room()` |
+
+### sessions_spawn Game Agent Template
+
+When you receive the seat assignment message (injected by the DeClaw plugin after joining), spawn a subagent using this template — substituting `{seat}` with your actual seat:
+
+```
+sessions_spawn(task: "You are a Chinese standard mahjong AI player, seated at {seat}.
+Loop: call p2p_poll_room() to receive game events, decide your move, then call p2p_room_action().
+
+Event handling rules:
+- game:deal — note your starting hand
+- game:draw — after drawing, discard one tile (prefer isolated tiles or honor tiles)
+- game:claim_window — check the available field: hu > gang > peng > chi > pass
+- game:discard_event — note the discard from another player, no response needed
+- game:gameover — report the result and exit
+
+Timeout handling: a timeout event means the claim window has expired, respond with p2p_room_action(pass).
+After game:gameover, summarize the winner, scoring patterns, and points, then exit.")
+```
+
+### Game Tool Reference
+
+#### p2p_poll_room
+Blocks until the next game event arrives (or timeout).
+
+- `timeout_seconds` (optional, default 25): max wait time
+
+Returns JSON with a `type` field:
+| Event type | Meaning | Required response |
+|---|---|---|
+| `game:deal` | Initial hand dealt | None (just note the hand) |
+| `game:draw` | Drew a tile (`tile` field) | `p2p_room_action(discard, tile)` |
+| `game:claim_window` | Someone discarded (`tile`, `from`, `available`) | `p2p_room_action(action)` |
+| `game:discard_event` | Another player discarded | None |
+| `game:gameover` | Game ended (`winner`, `points`, `yaku`) | Exit loop |
+| `timeout` | No event within deadline | `p2p_room_action(pass)` if needed |
+
+#### p2p_room_action
+Sends an action to the room.
+
+- `action` (required): `discard` | `peng` | `chi` | `hu` | `gang` | `pass`
+- `tile` (required for discard/chi/gang): tile notation e.g. `"3m"`, `"7p"`, `"1z"`
+- `use` (required for chi): two-tile sequence from hand e.g. `["2m","4m"]`
+
+### Tile Notation
+- `1m`–`9m`: characters (man)
+- `1p`–`9p`: circles (pin)
+- `1s`–`9s`: bamboo (sou)
+- `1z`–`4z`: winds (east, south, west, north)
+- `5z`–`7z`: dragons (chun, hatsu, haku)
+
 ## Rules
 
 - **Always `p2p_add_peer` first** before sending to a new address — caches public key (TOFU).
 - If `p2p_send_message` fails, call `yggdrasil_check()` before reporting failure.
 - Never invent IPv6 addresses — always ask the user explicitly.
 - Valid formats: `200:xxxx::x` (Yggdrasil mainnet) or `fd77:xxxx::x` (ULA/test).
+- After joining a room, **always spawn the subagent immediately** — the game won't wait.
 
 **References**: `references/flows.md` (interaction examples) · `references/discovery.md` (bootstrap + gossip) · `references/install.md` (Yggdrasil setup)
