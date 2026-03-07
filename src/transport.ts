@@ -4,14 +4,16 @@
  * Defines the interface that all transport backends (Yggdrasil, QUIC, native IPv6)
  * must implement, plus the TransportManager that handles automatic selection.
  */
-import { Identity } from "./types"
+import { Identity, Endpoint } from "./types"
 
 export type TransportId = "yggdrasil" | "quic" | "native-ipv6"
 
 export interface TransportEndpoint {
   transport: TransportId
   address: string    // ygg addr, or host:port for QUIC
+  port: number       // listening port
   priority: number   // lower = preferred
+  ttl: number        // seconds until re-resolve
 }
 
 export interface Transport {
@@ -108,8 +110,17 @@ export class TransportManager {
   }
 
   /** Get endpoints for all active transports (for peer announcements). */
-  getEndpoints(): TransportEndpoint[] {
-    return Array.from(this._transports.values()).map((t) => t.getEndpoint())
+  getEndpoints(): Endpoint[] {
+    return Array.from(this._transports.values()).map((t) => {
+      const ep = t.getEndpoint()
+      return {
+        transport: ep.transport as Endpoint["transport"],
+        address: ep.address,
+        port: ep.port,
+        priority: ep.priority,
+        ttl: ep.ttl,
+      }
+    })
   }
 
   /** Find a transport that can reach the given address. */

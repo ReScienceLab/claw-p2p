@@ -275,7 +275,9 @@ export class QUICTransport implements Transport {
     return {
       transport: "quic",
       address: this._address,
-      priority: 10, // Lower priority than Yggdrasil
+      port: this._port,
+      priority: 10,
+      ttl: 3600,
     }
   }
 }

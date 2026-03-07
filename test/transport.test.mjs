@@ -33,7 +33,7 @@ describe("TransportManager", () => {
       isActive: () => false,
       send: async () => {},
       onMessage: () => {},
-      getEndpoint: () => ({ transport: "quic", address: "", priority: 10 }),
+      getEndpoint: () => ({ transport: "quic", address: "", port: 8098, priority: 10, ttl: 3600 }),
     }
     tm.register(mock)
     // start returns null since mock transport fails
@@ -51,7 +51,7 @@ describe("TransportManager", () => {
       isActive: () => false,
       send: async () => {},
       onMessage: () => {},
-      getEndpoint: () => ({ transport: "yggdrasil", address: "", priority: 1 }),
+      getEndpoint: () => ({ transport: "yggdrasil", address: "", port: 8099, priority: 1, ttl: 86400 }),
     }
     const successTransport = {
       id: "quic",
@@ -61,7 +61,7 @@ describe("TransportManager", () => {
       isActive: () => true,
       send: async () => {},
       onMessage: () => {},
-      getEndpoint: () => ({ transport: "quic", address: "1.2.3.4:8098", priority: 10 }),
+      getEndpoint: () => ({ transport: "quic", address: "1.2.3.4:8098", port: 8098, priority: 10, ttl: 3600 }),
     }
     tm.register(failTransport)
     tm.register(successTransport)
@@ -81,7 +81,7 @@ describe("TransportManager", () => {
       isActive: () => true,
       send: async () => {},
       onMessage: () => {},
-      getEndpoint: () => ({ transport: "yggdrasil", address: "200::1", priority: 1 }),
+      getEndpoint: () => ({ transport: "yggdrasil", address: "200::1", port: 8099, priority: 1, ttl: 86400 }),
     }
     const t2 = {
       id: "quic",
@@ -91,7 +91,7 @@ describe("TransportManager", () => {
       isActive: () => true,
       send: async () => {},
       onMessage: () => {},
-      getEndpoint: () => ({ transport: "quic", address: "1.2.3.4:8098", priority: 10 }),
+      getEndpoint: () => ({ transport: "quic", address: "1.2.3.4:8098", port: 8098, priority: 10, ttl: 3600 }),
     }
     tm.register(t1)
     tm.register(t2)
@@ -112,7 +112,7 @@ describe("TransportManager", () => {
       isActive: () => true,
       send: async () => {},
       onMessage: () => {},
-      getEndpoint: () => ({ transport: "yggdrasil", address: "200::1", priority: 1 }),
+      getEndpoint: () => ({ transport: "yggdrasil", address: "200::1", port: 8099, priority: 1, ttl: 86400 }),
     }
     tm.register(t1)
     const id = { agentId: "", publicKey: "", privateKey: "", cgaIpv6: "", yggIpv6: "" }
@@ -135,7 +135,7 @@ describe("TransportManager", () => {
       isActive: () => true,
       send: async () => {},
       onMessage: () => {},
-      getEndpoint: () => ({ transport: "yggdrasil", address: "200::1", priority: 1 }),
+      getEndpoint: () => ({ transport: "yggdrasil", address: "200::1", port: 8099, priority: 1, ttl: 86400 }),
     }
     tm.register(ygg)
     // We need to call start to populate internal maps
@@ -156,7 +156,7 @@ describe("TransportManager", () => {
       isActive: () => true,
       send: async () => {},
       onMessage: () => {},
-      getEndpoint: () => ({ transport: "quic", address: "1.2.3.4:8098", priority: 10 }),
+      getEndpoint: () => ({ transport: "quic", address: "1.2.3.4:8098", port: 8098, priority: 10, ttl: 3600 }),
     }
     tm.register(t)
     const id = { agentId: "", publicKey: "", privateKey: "", cgaIpv6: "", yggIpv6: "" }

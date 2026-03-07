@@ -97,7 +97,9 @@ export class YggdrasilTransport implements Transport {
     return {
       transport: "yggdrasil",
       address: this._address,
-      priority: 1, // Yggdrasil is preferred when available
+      port: 8099,
+      priority: 1,
+      ttl: 86400,
     }
   }
 
